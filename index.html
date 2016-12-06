@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+	<meta charset="UTF-8">
+	<title>ListjQueryAjax</title>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+	<style>
+#llsearch > p {
+	cursor: pointer;
+}
+	</style>
+	<script>
+		$(function(){
+
+			$('#country').on('change', function(){
+				$.ajax({
+					url: "country.php",
+					type: "POST",
+					data: ({country:$('#country').val()}),
+					dataType: "html",
+					beforeSend: functBeforeSend, 
+					success: function(data) {
+						cityList(data);}
+					})// закрытие ajax запроса
+			}) // закрытие onchange
+		}) 
+
+		function functBeforeSend() {
+
+		}
+
+		function cityList(x) {
+			// $('#city').html("");
+			// $('#city').append('<option value="0"></option>');
+			// console.log(x);
+			var mas = JSON.parse(x);
+			// console.log(mas);
+			// alert(typeof mas);
+			for(var i=0; i<mas.length; i++) {
+			// console.log(mas);
+			$('#city').append('<option value = '+i+'>'+mas[i]+'</option>')
+			console.log(i);
+		}
+	}
+
+// ------ Live search ----------
+
+var xx;
+$(function(){
+	$('#livesearch').keyup(function(event){
+		$.ajax({
+			url: "ls.php",
+			type: "POST",
+			data: ({livesearch:$('#livesearch').val()}),
+			dataType: "html",
+			beforeSend: functBeforeSend, 
+			success: function(data) {
+				List(data);}
+					})// закрытие ajax запроса
+		xx = ($('#livesearch').val());
+			}) // закрытие onchange
+}) 
+
+function List(x) {
+	var mas = JSON.parse(x);
+	var availableTags = mas.split(",");
+	var str = xx;
+	if (str) {
+		var aa = availableTags.filter(
+			function (s) {
+				return (s.indexOf(str)===0);
+			}
+			);
+	};
+	$('#llsearch').children().remove();
+	for(var i=0; i<aa.length; i++) {
+		$('#llsearch').append('<p>'+aa[i]+'</p>');
+	}
+}
+
+$(function(){
+	$('#llsearch').on('click', function(event) {
+		if(event.target.tagName = "p")
+			$('#livesearch').val(event.target.innerHTML);
+		$('#llsearch').children().remove();
+	})
+})
+
+</script>
+
+</head>
+<body>
+	<label for="country">Выберите страну</label>
+	<select name="" id="country">
+		<option value="0" selected></option>
+		<option value="1">USA</option>
+		<option value="2">England</option>
+		<option value="3">Germany</option>
+		<option value="4">Poland</option>
+	</select>
+	<label for="city">Выберите город</label>
+	<select style="min-width:100px" name="" id="city">
+		<option value="0"></option>
+	</select>
+	<br>
+	<br>
+	<div>
+		
+		<!-- Live search -->
+		<label for="livesearch" id=""></label>
+		<input type="text" id="livesearch">
+		<div id = "llsearch"></div>
+	</div>
+</body>
+</html>
